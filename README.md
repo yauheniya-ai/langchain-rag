@@ -2,6 +2,8 @@
 
 **Building an AI Legal Agent to Parse Complex Legislation**
 
+<img src="./assets/agent_semantic-search.png" width="800">
+
 This project demonstrates how to build a Retrieval Augmented Generation (RAG) system using LangChain that can intelligently query PDF documents. We'll create an AI agent capable of answering specific questions about the "Wireless Electric Vehicle Charging Grant Program Act of 2025" by combining document retrieval with large language model reasoning.
 
 ## 🚀 Features
@@ -32,10 +34,6 @@ cd langchain-rag
 ```bash
 # Using uv (recommended)
 uv venv --python=3.12
-
-# Or using standard venv
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 3. **Install dependencies:**
@@ -43,30 +41,31 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Using uv
 uv pip install -r requirements.txt
 
-# Or using pip
-pip install -r requirements.txt
 ```
 
 4. **Set up environment variables:**
 ```bash
-# Create .env file and add your API key
-echo "GOOGLE_API_KEY=your_google_api_key_here" > .env
+# Create .env file and add your API keys
+LANGCHAIN_KEY=""
+GOOGLE_API_KEY=""
 ```
 
 ## 📁 Project Structure
 
 ```
 langchain-rag/
+├── assets/                            # Images and charts
 ├── data/
 │   ├── input/
 │   │   └── BILLS-119hr1892ih.pdf      # Legal document
 │   └── output/
 │       └── langgraph.png              # Generated workflow diagram
-├── notebooks/
-│   └── rag_demo.ipynb                 # Main RAG implementation
+├── langchain-rag.ipynb                # Main RAG implementation
 ├── requirements.txt                   # Python dependencies
-├── .env                              # Environment variables
-└── README.md                         # This file
+├── .env                               # Environment variables
+├── .gitignore                         # Protect sensitive files
+├── LICENSE                            # Project license
+└── README.md                          # This file
 ```
 
 ## 🔧 Usage
@@ -80,50 +79,6 @@ The core RAG implementation follows a four-step preprocessing pipeline:
 3. **Embed**: Convert text to 768-dimensional vectors
 4. **Store**: Index embeddings in vector database
 
-### Running the Demo
-
-```python
-# Load and process the legal document
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-loader = PyPDFLoader("./data/input/BILLS-119hr1892ih.pdf")
-docs = loader.load()
-
-# Split at legal section boundaries
-text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=1000,
-    chunk_overlap=200,
-    separators=[r"(?=SEC\.)"],
-    is_separator_regex=True
-)
-splits = text_splitter.split_documents(docs)
-
-# Create embeddings and store
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_core.vectorstores import InMemoryVectorStore
-
-embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-vector_store = InMemoryVectorStore(embeddings)
-vector_store.add_documents(splits)
-```
-
-### Query the System
-
-```python
-# Ask specific legal questions
-questions = [
-    "What is the maximum grant amount that an eligible entity can receive?",
-    "What is the maximum Federal share percentage allowed?",
-    "What total amount is authorized to be appropriated?"
-]
-
-for question in questions:
-    result = graph.invoke({"question": question})
-    print(f"Q: {question}")
-    print(f"A: {result['answer']}\n")
-```
-
 ## 🎯 Key Design Decisions
 
 ### Semantic Chunking
@@ -133,6 +88,8 @@ We split documents at legal section boundaries (`SEC.`) rather than arbitrary ch
 - **k=10**: Retrieves ~10,000 characters of context (vs default k=4)
 - **Chunk overlap**: 200 characters to maintain context continuity
 - **Custom prompting**: Emphasizes exact quotation and artifact cleaning
+
+<img src="./assets/agent_rag-simple.png" width="800">
 
 ### Model Selection
 - **Embeddings**: Google's `embedding-001` (768 dimensions)
@@ -151,9 +108,9 @@ Our RAG system achieves high precision on legal document queries:
 | Policy details | 100% | Factual accuracy |
 
 Sample results:
-- **Maximum grant**: "$25,000,000" ✓
-- **Federal share**: "80 percent of total cost" ✓  
-- **Total appropriation**: "$250,000,000" ✓
+- Question: What is the maximum grant amount (in dollars) that an eligible entity can receive under the Wireless Electric Vehicle Charging Grant Program Act of 2025?
+- Answer: "The amount of a grant awarded to an eligible entity under the Program may not exceed $25,000,000."
+
 
 ## 🔍 Advanced Features
 
@@ -194,13 +151,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 For a detailed walkthrough of this implementation, check out the full Medium article:
 
 **[Retrieval Augmented Generation (RAG) with LangChain](https://medium.com/@yauheniya.ai/retrieval-augmented-generation-rag-with-langchain-bd79ad08d750)**
-
-## 📧 Contact
-
-- **Author**: Yauheniya AI
-- **Medium**: [@yauheniya.ai](https://medium.com/@yauheniya.ai)
-- **GitHub**: [yauheniya-ai](https://github.com/yauheniya-ai)
-
----
-
-*Built with ❤️ using LangChain, Google AI, and modern RAG techniques*
