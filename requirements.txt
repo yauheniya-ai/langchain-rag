@@ -1,0 +1,9 @@
+langchain-text-splitters 
+langchain-community
+langchain-google-genai
+langchain-core
+langgraph
+pypdf
+ipykernel 
+jupyter 
+python-dotenv
