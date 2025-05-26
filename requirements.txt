@@ -4,6 +4,8 @@ langchain-google-genai
 langchain-core
 langgraph
 pypdf
+pandas
+matplotlib
 ipykernel 
 jupyter 
 python-dotenv
