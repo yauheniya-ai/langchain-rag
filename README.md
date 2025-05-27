@@ -2,7 +2,10 @@
 
 **Building an AI Legal Agent to Parse Complex Legislation**
 
-<img src="./assets/agent_semantic-search.png" width="800">
+<figure>
+  <img src="./assets/agent_rag-with-langchain.png" width="800">
+  <figcaption style="text-align: center; font-style: italic;">Querying Legal Documents with LangChain</figcaption>
+</figure>
 
 This project demonstrates how to build a Retrieval Augmented Generation (RAG) system using LangChain that can intelligently query PDF documents. We'll create an AI agent capable of answering specific questions about the "Wireless Electric Vehicle Charging Grant Program Act of 2025" by combining document retrieval with large language model reasoning.
 
@@ -19,8 +22,8 @@ This project demonstrates how to build a Retrieval Augmented Generation (RAG) sy
 ## 📋 Prerequisites
 
 - Python 3.12+
-- Google AI API key (for Gemini models and embeddings)
-- Virtual environment manager (uv, conda, or venv)
+- Google AI API key (for LLM and embeddings)
+- Virtual environment manager (e.g. uv)
 
 ## 🛠️ Installation
 
@@ -30,7 +33,7 @@ git clone https://github.com/yauheniya-ai/langchain-rag
 cd langchain-rag
 ```
 
-2. **Create virtual environment:**
+2. **Create virtual environment and activate as instructed:**
 ```bash
 # Using uv (recommended)
 uv venv --python=3.12
@@ -45,7 +48,7 @@ uv pip install -r requirements.txt
 
 4. **Set up environment variables:**
 ```bash
-# Create .env file and add your API keys
+# Rename .env.sample to .env and add your API keys
 LANGCHAIN_KEY=""
 GOOGLE_API_KEY=""
 ```
@@ -54,12 +57,11 @@ GOOGLE_API_KEY=""
 
 ```
 langchain-rag/
-├── assets/                            # Images and charts
+├── assets/                            # Images
 ├── data/
 │   ├── input/
 │   │   └── BILLS-119hr1892ih.pdf      # Legal document
-│   └── output/
-│       └── langgraph.png              # Generated workflow diagram
+│   └── output/                        # Generated files            
 ├── langchain-rag.ipynb                # Main RAG implementation
 ├── requirements.txt                   # Python dependencies
 ├── .env                               # Environment variables
@@ -72,24 +74,36 @@ langchain-rag/
 
 ### Basic RAG Pipeline
 
-The core RAG implementation follows a four-step preprocessing pipeline:
+<figure>
+  <img src="./assets/agent_rag-preprocessing-pipeline.png" width="800">
+  <figcaption style="text-align: center; font-style: italic;">The RAG Preprocessing Pipeline</figcaption>
+</figure>
+
+The RAG implementation follows a four-step preprocessing pipeline:
 
 1. **Load**: Parse PDF with metadata preservation
 2. **Split**: Chunk text at semantic boundaries (legal sections)
+
+<figure>
+  <img src="./data/output/split_page_chart.png" width="800">
+  <figcaption style="text-align: center; font-style: italic;">Visualization of the Split</figcaption>
+</figure>
+
 3. **Embed**: Convert text to 768-dimensional vectors
 4. **Store**: Index embeddings in vector database
 
-## 🎯 Key Design Decisions
-
-### Semantic Chunking
-We split documents at legal section boundaries (`SEC.`) rather than arbitrary character limits. This preserves the logical structure of legal documents and improves retrieval accuracy.
-
 ### Retrieval Configuration
-- **k=10**: Retrieves ~10,000 characters of context (vs default k=4)
-- **Chunk overlap**: 200 characters to maintain context continuity
-- **Custom prompting**: Emphasizes exact quotation and artifact cleaning
 
-<img src="./assets/agent_rag-simple.png" width="800">
+
+<figure>
+  <img src="./assets/agent_langgraph-rag-pipeline.png" width="800">
+  <figcaption style="text-align: center; font-style: italic;">The LangGraph RAG Pipeline</figcaption>
+</figure>
+
+
+
+- `k=10`: Retrieves 10 chunks of context vs. default `k=4`
+- **Custom prompting**: Emphasizes exact quotation and artifact cleaning
 
 ### Model Selection
 - **Embeddings**: Google's `embedding-001` (768 dimensions)
@@ -104,50 +118,25 @@ Our RAG system achieves high precision on legal document queries:
 |---------------|----------|----------------|
 | Dollar amounts | 100% | Exact quotation |
 | Percentages | 100% | Precise extraction |
-| Legal citations | 100% | Complete references |
 | Policy details | 100% | Factual accuracy |
 
 Sample results:
 - Question: What is the maximum grant amount (in dollars) that an eligible entity can receive under the Wireless Electric Vehicle Charging Grant Program Act of 2025?
 - Answer: "The amount of a grant awarded to an eligible entity under the Program may not exceed $25,000,000."
 
-
-## 🔍 Advanced Features
-
-### LangGraph Workflow
-The system uses LangGraph to create a clean, debuggable pipeline:
-- **Retrieve step**: Similarity search with configurable k
-- **Generate step**: LLM reasoning with custom prompts
-- **State management**: Type-safe data flow between steps
-
-### Custom Prompting
-Our prompt template emphasizes:
-- Using only provided context
-- Exact quotation from source
-- Cleaning PDF artifacts (line numbers, formatting)
-- Explicit "Not in context" responses when information is unavailable
-
-## 🚧 Limitations & Future Work
-
-- **In-memory storage**: Consider persistent vector databases for production
-- **Single document**: Extend to multi-document legal research
-- **Re-ranking**: Add semantic re-ranking for improved precision
-- **Query expansion**: Handle complex multi-part legal questions
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
 ## 📝 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🔗 Learn More
+## 📚 Read More
 
 For a detailed walkthrough of this implementation, check out the full Medium article:
 
 **[Retrieval Augmented Generation (RAG) with LangChain](https://medium.com/@yauheniya.ai/retrieval-augmented-generation-rag-with-langchain-bd79ad08d750)**
+
+## 🔗 Refences 
+
+LangChain. [Build a Retrieval Augmented Generation (RAG) App: Part 1.](https://python.langchain.com/docs/tutorials/rag/) 
+
+LangChain. [Build a semantic search engine.](https://python.langchain.com/docs/tutorials/retrievers/) 
+
